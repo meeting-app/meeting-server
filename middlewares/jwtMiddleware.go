@@ -8,9 +8,9 @@ import (
 )
 
 func SetAuthenticate(g *echo.Group) {
-	var secret = os.Getenv("JWT_SECRET")
+	secret := os.Getenv("JWT_SECRET")
 	g.Use(middleware.JWTWithConfig(middleware.JWTConfig{
-		SigningMethod: "HS512",
+		SigningMethod: "HS256",
 		SigningKey:    []byte(secret),
 	}))
 }

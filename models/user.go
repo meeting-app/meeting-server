@@ -1,6 +1,10 @@
-package users
+package models
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type UserModel struct {
 	ID           uint   `gorm:"primary_key"`
@@ -11,7 +15,8 @@ type UserModel struct {
 
 func (u *UserModel) setPassword(password string) error {
 	if len(password) < 6 {
-		return error.New("invalid password")
+		fmt.Errorf("Password invalid")
+		return nil
 	}
 	bytePassword := []byte(password)
 	passwordHash, _ := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
