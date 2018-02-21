@@ -1,19 +1,20 @@
 package database
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+)
 
 var DB *gorm.DB
 
-func Init() *gorm.DB {
-	// TODO: Set params gorm.Open
-	db, err := gorm.Open("", "")
+func Init() {
+	db, err := gorm.Open("sqlite3", "meeting.db")
 	if err != nil {
 		panic(err)
 	}
 	DB = db
-	return DB
 }
 
-func getDB() *gorm.DB {
+func GetDB() *gorm.DB {
 	return DB
 }
