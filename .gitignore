@@ -1,2 +1,5 @@
 # misc
 .env
+
+# db
+*.db
