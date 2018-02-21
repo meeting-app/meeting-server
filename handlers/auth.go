@@ -5,6 +5,7 @@ import (
 	"os"
 
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/ezradiniz/meeting-server/models"
 	"github.com/ezradiniz/meeting-server/serializers"
 	"github.com/labstack/echo"
 )
@@ -16,8 +17,9 @@ func createToken(user *serializers.UserResponse) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := make(jwt.MapClaims)
-	claims["email"] = user.Email
+	claims["name"] = user.Name
 	claims["username"] = user.Username
+	claims["email"] = user.Email
 
 	token.Claims = claims
 	tokenString, err := token.SignedString([]byte(secret))
@@ -25,16 +27,25 @@ func createToken(user *serializers.UserResponse) (string, error) {
 	return tokenString, err
 }
 
-func GetUser(c echo.Context) error {
+func LoginUser(c echo.Context) error {
 	user := new(serializers.UserResponse)
 
 	if err := c.Bind(user); err != nil {
 		return err
 	}
 
-	// TODO: Check user authenticate in db
+	userModel, err := models.FindUser(user.Email, user.Password)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	tokenString, _ := createToken(user)
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"name":     userModel.Name,
+		"username": userModel.Username,
+		"token":    tokenString,
+	})
 }
 
 func CreateUser(c echo.Context) error {
@@ -44,7 +55,15 @@ func CreateUser(c echo.Context) error {
 		return err
 	}
 
-	// TODO: Insert user into db
+	userModel := &models.UserModel{}
+	userModel.Name = user.Name
+	userModel.Username = user.Username
+	userModel.Email = user.Email
+	userModel.SetPassword(user.Password)
+
+	if err := models.AddUser(userModel); err != nil {
+		return err
+	}
 
 	tokenString, err := createToken(user)
 
@@ -53,6 +72,8 @@ func CreateUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{
-		"token": tokenString,
+		"name":     user.Name,
+		"username": user.Username,
+		"token":    tokenString,
 	})
 }

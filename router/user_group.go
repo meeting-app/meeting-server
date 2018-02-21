@@ -5,6 +5,6 @@ import (
 	"github.com/labstack/echo"
 )
 
-func AuthGroup(g *echo.Group) {
-	g.POST("", handlers.LoginUser)
+func UserGroup(g *echo.Group) {
+	g.POST("", handlers.CreateUser)
 }
