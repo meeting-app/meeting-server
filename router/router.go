@@ -7,8 +7,10 @@ import (
 func New() *echo.Echo {
 	e := echo.New()
 
-	auth := e.Group("/auth")
-	user := e.Group("/users")
+	api := e.Group("/api/v1")
+
+	auth := api.Group("/auth")
+	user := api.Group("/users")
 
 	AuthGroup(auth)
 	UserGroup(user)
