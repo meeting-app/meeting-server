@@ -6,8 +6,9 @@ import (
 	"github.com/labstack/echo"
 )
 
-// UserGroup create user group
-func UserGroup(g *echo.Group) {
-	g.POST("", handlers.CreateUser)
-	g.GET("", handlers.FetchCurrentUser, middlewares.GetAuthenticate())
+// PostGroup create post group
+func PostGroup(g *echo.Group) {
+	middlewares.SetAuthenticate(g)
+	g.POST("", handlers.CreatePost)
+	g.GET("", handlers.FetchAllPosts)
 }
