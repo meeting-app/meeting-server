@@ -5,19 +5,23 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// UserModel model
 type UserModel struct {
-	ID           uint   `gorm:"primary_key"`
-	Name         string `gorm:"column:name"`
-	Username     string `gorm:"column:username;unique_index"`
-	Email        string `gorm:"column:email;unique_index"`
-	PasswordHash string `gorm:"column:password;not null"`
+	ID           uint        `gorm:"primary_key"`
+	Name         string      `gorm:"column:name"`
+	Username     string      `gorm:"column:username;unique_index"`
+	Email        string      `gorm:"column:email;unique_index"`
+	PasswordHash string      `gorm:"column:password;not null"`
+	Posts        []PostModel `gorm:"foreignkey:UserID"`
 }
 
+// UserAutoMigrate ...
 func UserAutoMigrate() {
 	db := database.GetDB()
 	db.AutoMigrate(&UserModel{})
 }
 
+// SetPassword set user password
 func (u *UserModel) SetPassword(password string) error {
 	bytePassword := []byte(password)
 	passwordHash, _ := bcrypt.GenerateFromPassword(bytePassword, bcrypt.DefaultCost)
@@ -31,7 +35,8 @@ func (u *UserModel) checkPassword(password string) error {
 	return bcrypt.CompareHashAndPassword(bytePassword2, bytePassword1)
 }
 
-func FindUser(email, password string) (UserModel, error) {
+// FindUserLogin find user by email and password
+func FindUserLogin(email, password string) (UserModel, error) {
 	db := database.GetDB()
 	var model UserModel
 	if err := db.Where("email = ?", email).First(&model).Error; err != nil {
@@ -40,7 +45,15 @@ func FindUser(email, password string) (UserModel, error) {
 	return model, model.checkPassword(password)
 }
 
+// AddUser insert user into database
 func AddUser(user interface{}) error {
 	db := database.GetDB()
 	return db.Save(user).Error
+}
+
+// FindUserByEmail find user by email
+func FindUserByEmail(email string) (UserModel, error) {
+	db := database.GetDB()
+	var model UserModel
+	return model, db.Where("email = ?", email).First(&model).Error
 }

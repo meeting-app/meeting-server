@@ -7,9 +7,12 @@ import (
 )
 
 func main() {
-
 	e := router.New()
+
 	database.Init()
+	defer database.DB.Close()
+
 	models.AutoMigrate()
+
 	e.Logger.Fatal(e.Start(":8000"))
 }

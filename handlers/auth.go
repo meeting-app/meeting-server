@@ -12,13 +12,12 @@ import (
 
 var secret = os.Getenv("JWT_SECRET")
 
-func createToken(user *serializers.UserResponse) (string, error) {
+func createToken(user *models.UserModel) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	claims := make(jwt.MapClaims)
-	claims["name"] = user.Name
-	claims["username"] = user.Username
+	claims["id"] = user.ID
 	claims["email"] = user.Email
 
 	token.Claims = claims
@@ -27,6 +26,7 @@ func createToken(user *serializers.UserResponse) (string, error) {
 	return tokenString, err
 }
 
+// LoginUser user login
 func LoginUser(c echo.Context) error {
 	user := new(serializers.UserResponse)
 
@@ -34,46 +34,16 @@ func LoginUser(c echo.Context) error {
 		return err
 	}
 
-	userModel, err := models.FindUser(user.Email, user.Password)
+	userModel, err := models.FindUserLogin(user.Email, user.Password)
 	if err != nil {
 		return err
 	}
 
-	tokenString, _ := createToken(user)
+	tokenString, err := createToken(&userModel)
 
 	return c.JSON(http.StatusOK, map[string]string{
 		"name":     userModel.Name,
 		"username": userModel.Username,
-		"token":    tokenString,
-	})
-}
-
-func CreateUser(c echo.Context) error {
-	user := new(serializers.UserResponse)
-
-	if err := c.Bind(user); err != nil {
-		return err
-	}
-
-	userModel := &models.UserModel{}
-	userModel.Name = user.Name
-	userModel.Username = user.Username
-	userModel.Email = user.Email
-	userModel.SetPassword(user.Password)
-
-	if err := models.AddUser(userModel); err != nil {
-		return err
-	}
-
-	tokenString, err := createToken(user)
-
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, map[string]string{
-		"name":     user.Name,
-		"username": user.Username,
 		"token":    tokenString,
 	})
 }
