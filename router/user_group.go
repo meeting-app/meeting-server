@@ -10,4 +10,5 @@ import (
 func UserGroup(g *echo.Group) {
 	g.POST("", handlers.CreateUser)
 	g.GET("", handlers.FetchCurrentUser, middlewares.GetAuthenticate())
+	g.GET("/:username", handlers.FetchUser)
 }

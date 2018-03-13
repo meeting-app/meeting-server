@@ -57,3 +57,12 @@ func FindUserByEmail(email string) (UserModel, error) {
 	var model UserModel
 	return model, db.Where("email = ?", email).First(&model).Error
 }
+
+// FindUserByUsername find user by username
+func FindUserByUsername(username string) (UserModel, error) {
+	db := database.GetDB()
+
+	// TODO: Refactor later
+	var model UserModel
+	return model, db.Where("username = ?", username).First(&model).Error
+}

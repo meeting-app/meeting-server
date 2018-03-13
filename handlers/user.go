@@ -60,3 +60,20 @@ func FetchCurrentUser(c echo.Context) error {
 		"token":    user.Raw,
 	})
 }
+
+// FetchUser fetch user by username
+func FetchUser(c echo.Context) error {
+	username := c.Param("username")
+
+	user, err := models.FindUserByUsername(username)
+
+	if err != nil {
+		return err
+	}
+
+	// TODO: Change user.Username to name
+	return c.JSON(http.StatusOK, map[string]string{
+		"name":     user.Username, // user.Name
+		"username": user.Username,
+	})
+}
