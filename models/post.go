@@ -28,15 +28,16 @@ func AddPost(post interface{}) error {
 	return db.Save(post).Error
 }
 
-// FindAllPostsByUser find all posts from user
-func FindAllPostsByUser(userID uint) ([]PostModel, error) {
+// FindAllPostsFromUser find all posts from user
+func FindAllPostsFromUser(username string) ([]serializers.PostResponse, error) {
 	db := database.GetDB()
 
-	user := UserModel{}
-	posts := []PostModel{}
+	res := []serializers.PostResponse{}
 
-	db.First(&user, userID)
-	return posts, db.Model(&user).Related(&posts, "Posts").Error
+	// TODO: Refactor later
+	err := db.Table("post_models").Select("post_models.ID as id, post_models.Text as text, post_models.created_at as created_at").Joins("inner join user_models ON post_models.user_id = user_models.id").Where("user_models.username = ?", username).Order("created_at desc").Scan(&res).Error
+
+	return res, err
 }
 
 // FindAllPosts find all posts

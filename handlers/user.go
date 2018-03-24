@@ -77,3 +77,25 @@ func FetchUser(c echo.Context) error {
 		"username": user.Username,
 	})
 }
+
+// FetchAllPostsFromUser fetch all posts from user
+func FetchAllPostsFromUser(c echo.Context) error {
+	username := c.Param("username")
+
+	posts, err := models.FindAllPostsFromUser(username)
+	if err != nil {
+		return err
+	}
+
+	/*
+	 *  res := make([]serializers.PostResponse, len(posts))
+	 *
+	 *  for i, post := range posts {
+	 *    res[i].ID = fmt.Sprintf("%v", post.ID)
+	 *    res[i].Text = post.Text
+	 *    res[i].CreatedAt = post.CreatedAt
+	 *  }
+	 */
+
+	return c.JSON(http.StatusOK, posts)
+}
