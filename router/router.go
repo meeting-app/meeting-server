@@ -10,10 +10,12 @@ func New() *echo.Echo {
 
 	api := e.Group("/api/v1")
 
+	me := api.Group("/me")
 	auth := api.Group("/auth")
 	user := api.Group("/users")
 	post := api.Group("/posts")
 
+	MeGroup(me)
 	AuthGroup(auth)
 	UserGroup(user)
 	PostGroup(post)
